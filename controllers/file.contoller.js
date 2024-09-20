@@ -3,7 +3,11 @@ const csvToJson = require('csvtojson')
 
 const uploadFile = async(req,res)=>{
     const file = req.file
-    const fileName = req.file.originalname
+    const fileName = req.file != undefined 
+                    ? req.file.originalname
+                    : ''
+
+                console.log('filename', fileName)
     try{
         if(!file)return res.status(400).json({
             ok:false,

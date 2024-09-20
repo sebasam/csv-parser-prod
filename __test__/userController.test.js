@@ -5,37 +5,34 @@ const bcrypt = require('bcrypt')
 const User = require('./../models/User')
 
 describe('User Controller testing', () => {
+    const email = 'test@test.com'
+    const password = '#Clave1234'
     beforeEach(async () => {
         await User.deleteMany({})
-        console.log('beforeEach Ejecutado')
     }, 10000)
 
     afterAll(async () => {
         await User.deleteMany({})
         await mongoose.connection.close()
-        console.log('afterAll Ejecutado y conexion cerrada')
     })
 
     it('Debería registrar un usuario nuevo si el correo no existe en la base de datos', async () => {
-        const email = 'test@test.com'
-        console.log('Supertest va a hacer la peticion POST')
         const response = await request(app)
             .post('/api/register')
-            .send({ email: email, password: '#Clave1234' })
-            console.log('Supertest va finalizo la peticion post la respuesta es: ', response)
+            .send({ email: email, password: password })
         expect(response.statusCode).toBe(201)
         expect(response.body).toHaveProperty('msg', `${ email } created successfuly`)
     })
 
     it('No debería registrar un user si el correo existe', async() => {
         await new User({
-            email: 'test@test.com',
-            password: '#Clave1234'
+            email: email,
+            password: password
         }).save()
 
         const response = await request(app)
                         .post('/api/register')
-                        .send({ email: 'test@test.com', password: '#Clave1234' })
+                        .send({ email: email, password: password })
 
         expect(response.statusCode).toBe(400)
         expect(response.body).toHaveProperty('ok', false)
@@ -43,10 +40,9 @@ describe('User Controller testing', () => {
     })
 
     it('Debería logear a un usuario con credenciales correctas', async() => {
-        const password = '#Clave1234'
         const hashedPassword = bcrypt.hashSync(password, 10)
         const user = await new User({
-            email: 'test@test.com',
+            email: email,
             password: hashedPassword
         })
         user.save()
@@ -60,10 +56,9 @@ describe('User Controller testing', () => {
     })
 
     it('No debería loguear al usuario con un password incorrecto', async() => {
-        const password = '#Clave1234'
         const hashedPassword = bcrypt.hashSync(password, 10)
         const user = await new User({
-            email: 'test@test.com',
+            email: email,
             password: hashedPassword
         })
         user.save()
@@ -83,7 +78,7 @@ describe('User Controller testing', () => {
 
         const response = await request(app)
                         .post('/api/login')
-                        .send({ email: 'juan@test.com', password: 'Clave' })
+                        .send({ email: email, password: 'Clave' })
 
         expect(response.statusCode).toBe(500)
     })

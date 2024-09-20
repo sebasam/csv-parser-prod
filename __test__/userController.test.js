@@ -45,7 +45,7 @@ describe('User Controller testing', () => {
             email: email,
             password: hashedPassword
         })
-        user.save()
+        await user.save()
         const response = await request(app)
                             .post('/api/login')
                             .send({ email: user.email, password: password })
@@ -61,7 +61,7 @@ describe('User Controller testing', () => {
             email: email,
             password: hashedPassword
         })
-        user.save()
+        await user.save()
         const response = await request(app)
                     .post('/api/login')
                     .send({ email: user.email, password: 'incorrecta' })

@@ -36,5 +36,17 @@ describe('File Controller Tests', () => {
         expect(response.statusCode).toBe(400)
     })
 
-    
+    it('Debería obtener un archivo por ID', async () => {
+        const file = await new File({
+            name: 'sample.csv',
+            data: []
+        }).save()
+        const response = await request(app)
+            .get(`/api/file/${file._id.toString()}`)
+            .set('Authorization', `Bearer ${token}`);
+        console.log('response', response.body)
+        expect(response.statusCode).toBe(200);
+        expect(response.body.file).toHaveProperty('_id', file._id.toString());
+        expect(response.body.file).toHaveProperty('name', 'sample.csv');
+    });
 })
